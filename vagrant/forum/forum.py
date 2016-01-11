@@ -11,7 +11,7 @@ from wsgiref.simple_server import make_server
 from wsgiref import util
 
 # HTML template for the forum page
-HTML_WRAP = '''\
+HTML_WRAP = '''
 <!DOCTYPE html>
 <html>
   <head>
@@ -39,7 +39,7 @@ HTML_WRAP = '''\
 '''
 
 # HTML template for an individual comment
-POST = '''\
+POST = '''
     <div class=post><em class=date>%(time)s</em><br>%(content)s</div>
 '''
 
@@ -59,13 +59,16 @@ def View(env, resp):
 ## Request handler for posting - inserts to database
 def Post(env, resp):
     '''Post handles a submission of the forum's form.
-  
+
     The message the user posted is saved in the database, then it sends a 302
     Redirect back to the main page so the user can see their new post.
     '''
     # Get post content
     input = env['wsgi.input']
-    length = int(env.get('CONTENT_LENGTH', 0))
+    try:
+        length = int(env.get('CONTENT_LENGTH', 0))
+    except (ValueError):
+        length = 0
     # If length is zero, post is empty - don't save it.
     if length > 0:
         postdata = input.read(length)
@@ -79,7 +82,7 @@ def Post(env, resp):
     # 302 redirect back to the main page
     headers = [('Location', '/'),
                ('Content-type', 'text/plain')]
-    resp('302 REDIRECT', headers) 
+    resp('302 REDIRECT', headers)
     return ['Redirecting']
 
 ## Dispatch table - maps URL prefixes to request handlers
@@ -96,7 +99,7 @@ def Dispatcher(env, resp):
     else:
         status = '404 Not Found'
         headers = [('Content-type', 'text/plain')]
-        resp(status, headers)    
+        resp(status, headers)
         return ['Not Found: ' + page]
 
 
@@ -104,4 +107,3 @@ def Dispatcher(env, resp):
 httpd = make_server('', 8000, Dispatcher)
 print "Serving HTTP on port 8000..."
 httpd.serve_forever()
-
