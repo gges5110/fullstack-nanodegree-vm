@@ -8,32 +8,33 @@ import psycopg2
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
-
+    try:
+        db = psycopg2.connect("dbname=tournament")
+        cursor = db.cursor()
+        return db, cursor
+    except:
+        print("Connection error.")
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    conn = psycopg2.connect("dbname=tournament")
-    cur = conn.cursor()
-    cur.execute("delete from matches")
-    conn.commit()
-    conn.close()
+    db, cursor = connect()
+    cursor.execute("delete from matches")
+    db.commit()
+    db.close()
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    conn = psycopg2.connect("dbname=tournament")
-    cur = conn.cursor()
-    cur.execute("delete from players")
-    conn.commit()
-    conn.close()
+    db, cursor = connect()
+    cursor.execute("delete from players")
+    db.commit()
+    db.close()
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    conn = psycopg2.connect("dbname=tournament")
-    cur = conn.cursor()
+    conn, cur = connect()
     cur.execute("select count(*) from players")
-    num = cur.fetchall()[0][0]
+    num = cur.fetchone()[0]
     conn.close()
     return num
 
@@ -47,9 +48,10 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    conn = psycopg2.connect("dbname=tournament")
-    cur = conn.cursor()
-    cur.execute("INSERT INTO players (name) VALUES (%s)", (name, ))
+    conn, cur = connect()
+    query = "INSERT INTO players (name) VALUES (%s);"
+    parameter = (name,)
+    cur.execute(query, parameter)
     conn.commit()
     conn.close()
 
@@ -67,27 +69,11 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    conn = psycopg2.connect("dbname=tournament")
-    cur = conn.cursor()
-    cur.execute("select * from players")
-    players = ({
-            'id': str(row[0]),
-            'name': str(row[1])}
-            for row in cur.fetchall())
-    player_list = []
-    for player in players:
-        id = int(player['id'])
-        # print 'player id = ' + str(id)
-        cur.execute("select count(*) from matches where winner = %d" % id)
-        wins = cur.fetchall()[0][0]
-        cur.execute("select count(*) from matches where winner = %d or loser = %d" % (id, id))
-        matches = cur.fetchall()[0][0]
-        player_tuple = (player['id'], player['name'], int(wins), int(matches))
-        player_list.append(player_tuple)
-    player_list = sorted(player_list, key=lambda player: player[2])
-    # print player_list
+    conn, cur = connect()
+    cur.execute("SELECT * FROM standings;")
+    player_db = cur.fetchall()
     conn.close()
-    return player_list
+    return player_db
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
@@ -119,6 +105,9 @@ def swissPairings():
         name2: the second player's name
     """
     standings = playerStandings()
+    if len(standings) % 2 != 0:
+        raise Exception('swissPairingsError', 'Not even number of players.')
+
     match_list = []
     for i in range(0, len(standings), 2):
         tup = (standings[i][0], standings[i][1], standings[i + 1][0], standings[i + 1][1])
