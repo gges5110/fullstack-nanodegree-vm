@@ -1,4 +1,4 @@
-rdb-fullstack
+Intro to Relational Databases
 =============
 
-Common code for the Relational Databases and Full Stack Fundamentals courses
+Practice coding for SQL and PSQL
