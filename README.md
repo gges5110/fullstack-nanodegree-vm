@@ -34,16 +34,16 @@ psql
 <h2>What are the required setup in order to run the application successfully</h2>
 Write a client application for using the tournament library we provided. Here are the methods included:
 
-| function name   | Description |
-| :-------------- |:---------------|
-| connect         | Connects to the database. |
-| deleteMatches   | Remove all the matches records from the database.  |
-| deletePlayers   | Remove all the player records from the database. | 
-| countPlayers    | Returns the number of players currently registered.  |
-| registerPlayer  | Adds a player to the tournament database.|
-| playerStandings | Returns a list of the players and their win records, sorted by wins. |
-| reportMatch     | Record the winner and loser of a match.
-| swissPairings   | Returns a list of pairs of players for the next round of a match. The return value will a list with values: (id1, name1, id2, name2) |
+| function name   | Description | Corresponding test functions |
+| :-------------- |:---------------| :--------------- |
+| connect         | Connects to the database. | none |
+| deleteMatches   | Remove all the matches records from the database.  | testDeleteMatches |
+| deletePlayers   | Remove all the player records from the database. | testDelete |
+| countPlayers    | Returns the number of players currently registered.  | testCount |
+| registerPlayer  | Adds a player to the tournament database. | testRegister, testRegisterCountDelete |
+| playerStandings | Returns a list of the players and their win records, sorted by wins. | testStandingsBeforeMatches |
+| reportMatch     | Record the winner and loser of a match.| testReportMatches |
+| swissPairings   | Returns a list of pairs of players for the next round of a match. The return value will a list with values: (id1, name1, id2, name2) | testPairings |
 
 
 <h2>How to run the test cases</h2>
