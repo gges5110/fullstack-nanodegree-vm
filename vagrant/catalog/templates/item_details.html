@@ -1,0 +1,58 @@
+{% extends "/base.html" %}
+{% block content %}
+
+<style>
+#details_card {
+    width: 800px;
+    margin-top: 30px;
+}
+
+</style>
+
+<div class="mdl-cell mdl-cell--5-col mdl-cell--1-offset">
+    {% for dir in directory %}
+    <a href="{{dir.link}}" id='directory_links'>{{dir.name}}</a>
+    {% if loop.index < directory|length %}
+    >
+    {% endif %}
+    {% endfor %}
+
+    <div class="mdl-card mdl-shadow--2dp" id='details_card'>
+        <div class="mdl-card__title mdl-card--border">
+            <h3 class="mdl-card__title-text">{{item.title}}</h3>
+        </div>
+
+        <div class="mdl-card__media">
+            {% if item.picture == "" %}
+            <img src="http://www.hikinginmadrid.org/wp-content/uploads/2015/08/ski-snowboard-megeve-ecole-de-ski1.jpg" alt="Smiley face" width="800">
+            {% else %}
+            <img src="{{item.picture}}" alt="Smiley face" width="800">
+            {% endif %}
+        </div>
+
+
+        <div class="mdl-card__supporting-text mdl-card--border">
+            Description: {{item.description}}
+
+        </div>
+
+        <div class="mdl-card__supporting-text mdl-card--border">
+            Price: ${{item.price}}
+        </div>
+
+        <div class="mdl-card__actions mdl-card--border">
+
+            <a href="{{url_for('editItem', item_id = item.id)}}"
+                class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Edit
+            </a>
+            <a href="{{url_for('deleteItem', item_id = item.id)}}"
+                class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Delete
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

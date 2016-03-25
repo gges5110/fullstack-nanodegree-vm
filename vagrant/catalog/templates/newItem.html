@@ -1,0 +1,39 @@
+{% extends "/base.html" %}
+{% block content %}
+
+<div class="mdl-cell mdl-cell--5-col mdl-cell--4-offset">
+    <h3>New Item</h3>
+    <form action="{{url_for('newItem')}}" method='POST'>
+        <div class="mdl-textfield mdl-js-textfield">
+            <label class="mdl-textfield__label" for='input_title'>Title</label>
+            <input class="mdl-textfield__input" type="text" name='title' id='input_title'></input>
+        </div>
+
+        <div class="mdl-textfield mdl-js-textfield">
+            <label class="mdl-textfield__label" for='input_description'>Description</label>
+            <input class="mdl-textfield__input" type="text" name='description' id='input_description'></input>
+        </div>
+
+        <div class="mdl-textfield mdl-js-textfield">
+            <label class="mdl-textfield__label" for='input_price'>Price</label>
+            <input class="mdl-textfield__input" type="text" name='price' id='input_price'></input>
+        </div>
+
+        <div>
+            <select name='catalog_id'>
+                {% for catalog in categories %}
+                <option value='{{catalog.id}}'>{{catalog.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <input type='submit' value='Create' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"></input>
+    </form>
+
+    <form action="{{url_for('main_page')}}">
+        <input type="submit" value="Cancel" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"></input>
+    </form>
+</div>
+
+
+{% endblock %}

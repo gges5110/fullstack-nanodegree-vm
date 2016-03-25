@@ -1,0 +1,231 @@
+{% extends "/base.html" %}
+{% block content %}
+
+
+
+    <!-- <div class="mdl-cell mdl-cell--3-col mdl-cell--3-offset">
+        <h3>Categories</h3>
+        <ul class="demo-list-item mdl-list">
+        {% for catalog in categories %}
+        <li class="mdl-list__item">
+            <a href="{{url_for('items_by_catalog', catalog_id = catalog.id)}}">{{catalog.name}}</a>
+        </li>
+        {% endfor %}
+        </ul>
+    </div> -->
+
+    <div class="mdl-cell mdl-cell--6-col mdl-cell--1-offset">
+        {% for dir in directory %}
+        <a href="{{dir.link}}" id='directory_links'>{{dir.name}}</a>
+        {% if loop.index < directory|length %}
+        >
+        {% endif %}
+        {% endfor %}
+
+        <h3>Lastest Items</h3>
+
+        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" align="left">
+            <thead>
+                <tr>
+                <th>Title</th>
+                <th>Catagory</th>
+                <th>Description</th>
+                <th>Price</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for item in items %}
+            <tr class="content_tr">
+            <td><a href="{{url_for('single_catagory', catalog_id = item.catalog_id, item_id = item.id)}}">{{item.title}}</a></td>
+            <td class="mdl-color-text--grey-600">{{item.catalog.name}}</td>
+            <td class="mdl-color-text--grey-600">{{item.description}}</td>
+            <td class="mdl-color-text--grey-600">${{item.price}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mdl-cell mdl-cell--3-col">
+        <h3>Add Item</h3>
+
+        <div class="demo-card-square mdl-card mdl-shadow--2dp">
+
+          <div class="mdl-card__supporting-text">
+              <form action="{{url_for('newItem')}}" method='POST'>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <label class="mdl-textfield__label" for='input_title'>Title</label>
+                      <input class="mdl-textfield__input" type="text" name='title' id='input_title'></input>
+                  </div>
+
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <label class="mdl-textfield__label" for='input_description'>Description</label>
+                      <input class="mdl-textfield__input" type="text" name='description' id='input_description'></input>
+                  </div>
+
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <label class="mdl-textfield__label" for='input_price'>Price</label>
+                      <input class="mdl-textfield__input" type="text" name='price' id='input_price'></input>
+                  </div>
+
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <label class="mdl-textfield__label" for='input_picture'>Picture URL</label>
+                      <input class="mdl-textfield__input" type="text" name='picture' id='input_picture' placeholder="Optional"></input>
+                  </div>
+
+                  <div>
+                      <select name='catalog_id' id='input_catalog_id'>
+                          {% for catalog in categories %}
+                          <option value='{{catalog.id}}'>{{catalog.name}}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+
+                  <!-- <input type='submit' value='Create' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"></input> -->
+              </form>
+          </div>
+
+            <script>
+            $(document).on('click', '#create_btn', function(event) {
+                if (!($('#create_btn').prop("disabled") && $('#create_btn').prop("disabled", true))) {
+                    data = {};
+                    data['title'] = $('#input_title').val();
+                    data['description'] = $('#input_description').val();
+                    data['price'] = $('#input_price').val();
+                    data['picture'] = $('#input_picture').val();
+                    data['catalog_id'] = $('#input_catalog_id').val();
+
+                    if (!verifyInput(data)) {
+                        toastr.warning("Invalid input!");
+                        return;
+                    }
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{url_for('newItem_API')}}",
+                        data: JSON.stringify(data, null, '\t'),
+                        contentType: 'application/json;charset=UTF-8',
+                        success: function(response) {
+                            if (response) {
+                                console.log(response);
+                                toastr.success('Have fun storming the castle!', 'Miracle Max Says');
+                                $('#input_title').val("");
+                                $('#input_description').val("");
+                                $('#input_price').val("");
+                                $('#input_catalog_id').val("1");
+                            }
+                            else {
+                                toastr.warning('Error on creating new item.');
+                            }
+                        }
+                    });
+                }
+            })
+
+            function verifyInput(data) {
+                // data['title'] = $('#input_title').val();
+                // data['description'] = $('#input_description').val();
+                // data['price'] = $('#input_price').val();
+                // data['picture'] = $('#input_picture').val();
+                // data['catalog_id'] = $('#input_catalog_id').val();
+                if (data['title'] === '' || data['price'] === '') {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+
+            $(document).on('click', '#cancel_btn', function(event) {
+                toastr.info('Field cleared.');
+                $('#input_title').val("");
+                $('#input_description').val("");
+                $('#input_price').val("");
+                $('#input_catalog_id').val("1");
+            });
+            </script>
+
+        <div class="mdl-card__actions mdl-card--border">
+            {% if not login%}
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="create_btn" disabled='disabled'>
+            Create
+            </a>
+            <span class="mdl-tooltip mdl-tooltip--right" for="create_btn">
+                Please Login To Add New Items
+            </span>
+            {% else %}
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="create_btn">
+            Create
+            </a>
+
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" id="cancel_btn">
+            Cancel
+            </a>
+            {% endif %}
+        </div>
+
+
+    </div>
+        <!-- Raised button with ripple -->
+    </div>
+
+
+</div>
+<footer class="mdl-mega-footer" style="margin-top: 40px; ">
+    <div class="mdl-mega-footer__middle-section">
+        <div class="mdl-mega-footer__drop-down-section">
+            <input class="mdl-mega-footer__heading-checkbox" type="checkbox" checked>
+            <h1 class="mdl-mega-footer__heading">Features</h1>
+            <ul class="mdl-mega-footer__link-list">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Partners</a></li>
+            <li><a href="#">Updates</a></li>
+            </ul>
+        </div>
+
+        <div class="mdl-mega-footer__drop-down-section">
+            <input class="mdl-mega-footer__heading-checkbox" type="checkbox" checked>
+            <h1 class="mdl-mega-footer__heading">Details</h1>
+            <ul class="mdl-mega-footer__link-list">
+            <li><a href="#">Specs</a></li>
+            <li><a href="#">Tools</a></li>
+            <li><a href="#">Resources</a></li>
+            </ul>
+        </div>
+
+        <div class="mdl-mega-footer__drop-down-section">
+            <input class="mdl-mega-footer__heading-checkbox" type="checkbox" checked>
+            <h1 class="mdl-mega-footer__heading">Technology</h1>
+            <ul class="mdl-mega-footer__link-list">
+            <li><a href="#">How it works</a></li>
+            <li><a href="#">Patterns</a></li>
+            <li><a href="#">Usage</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">Contracts</a></li>
+            </ul>
+        </div>
+
+        <div class="mdl-mega-footer__drop-down-section">
+            <input class="mdl-mega-footer__heading-checkbox" type="checkbox" checked>
+            <h1 class="mdl-mega-footer__heading">FAQ</h1>
+            <ul class="mdl-mega-footer__link-list">
+            <li><a href="#">Questions</a></li>
+            <li><a href="#">Answers</a></li>
+            <li><a href="#">Contact us</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mdl-mega-footer__bottom-section">
+        <div class="mdl-logo">Title</div>
+            <ul class="mdl-mega-footer__link-list">
+            <li><a href="#">Help</a></li>
+            <li><a href="#">Privacy & Terms</a></li>
+        </ul>
+    </div>
+</footer>
+
+
+{% endblock %}

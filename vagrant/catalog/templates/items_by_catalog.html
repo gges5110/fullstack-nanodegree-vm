@@ -1,0 +1,46 @@
+{% extends "/base.html" %}
+{% block content %}
+
+
+<div class="mdl-cell mdl-cell--5-col mdl-cell--1-offset">
+
+{% for dir in directory %}
+<a href="{{dir.link}}" id='directory_links'>{{dir.name}}</a>
+{% if loop.index < directory|length %}
+>
+{% endif %}
+{% endfor %}
+
+
+<h3>{{catagory.name}}</h3>
+
+<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" align="left">
+    <thead>
+        <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Price</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for item in items %}
+    <tr class="content_tr">
+    <td><a href="{{url_for('single_catagory', catalog_id = item.catalog_id, item_id = item.id)}}">{{item.title}}</a></td>
+    <td class="mdl-color-text--grey-600">{{item.description}}</td>
+    <td class="mdl-color-text--grey-600">${{item.price}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<!-- <ol class="mdl-list mdl-shadow--2dp">
+{% for item in items %}
+<li class="mdl-list__item">
+    <a href="{{url_for('single_catagory', catalog_id = item.catalog_id, item_id = item.id)}}">{{item.title}}</a>
+</li>
+{% endfor %}
+</ol> -->
+</div>
+{% endblock %}

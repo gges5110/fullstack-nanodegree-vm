@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- <link rel="stylesheet" href="{{url_for('static', filename='material.min.css')}}"> -->
+        <link rel="stylesheet" href="{{url_for('static', filename='material.min.css')}}" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="{{url_for('static', filename='toastr.min.css')}}">
+        <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+        <script src="{{url_for('static', filename='material.min.js')}}"></script>
+        <script src="{{url_for('static', filename='toastr.js')}}"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="//apis.google.com/js/platform.js?onload=start"></script>
+
+
+        <!-- Uses a transparent header that draws on top of the layout's background -->
+        <style>
+        .demo-layout-transparent {
+          background: url("{{url_for('static', filename='transparent.jpg')}}") center / cover;
+        }
+        .demo-layout-transparent .mdl-layout__header,
+        .demo-layout-transparent .mdl-layout__drawer-button {
+          /* This background is dark, so we set text to white. Use 87% black instead if
+             your background is light. */
+          color: white;
+        }
+
+        .mdl-layout-title {
+            border-bottom:1px solid #757575;
+        }
+
+        .mdl-layout__drawer {
+            background-color: #E0EEEE;
+        }
+
+        .mdl-layout__content {
+            /*background-color: #546e7a !important;*/
+        }
+
+        html {
+            padding:0
+            height:100%;
+        }
+
+        .mdl-color-text--grey-600 {
+            color: #757575 !important;
+            font-size: 14px;
+        }
+
+        html > body {
+            font-family: 'Roboto','Helvetica','Arial',sans-serif!important;
+        }
+
+        body {
+            padding:0
+            height:100%;
+        }
+
+        footer {
+            width:100%
+            position:absolute;
+            bottom:0;
+        }
+
+        .profile_span {
+            padding-top: 10px;
+            padding-left: 40px;
+            line-height: 64px;
+        }
+
+        /*#directory_links {
+            color: white;
+        }*/
+
+        #main_page_link {
+            text-decoration: none;
+            color: black;
+        }
+
+        .content_tr.hover {
+           cursor: pointer;
+           /* whatever other hover styles you want */
+        }
+
+        .img-circle {
+            border-radius: 50%;
+        }
+        </style>
+
+    </head>
+    <!--
+    <a href="">Login</a>
+
+    <a href="{{url_for('showLogin')}}">Login</a>
+    <a href="">Logout</a>
+     -->
+
+
+    <body>
+        <!-- The drawer is always open in large screens. The header is always shown,
+  even in small screens. -->
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer
+                    mdl-layout--fixed-header">
+            <header class="mdl-layout__header mdl-layout__header--transparent mdl-layout__header--waterfall">
+                <div class="demo-layout-transparent mdl-layout__header-row">
+                    <!-- Add spacer, to align navigation to the right -->
+                    <div class="mdl-layout-spacer"></div>
+
+                    <!-- <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                                mdl-textfield--floating-label mdl-textfield--align-right">
+                      <label class="mdl-button mdl-js-button mdl-button--icon"
+                             for="fixed-header-drawer-exp">
+                        <i class="material-icons">search</i>
+                      </label>
+                      <div class="mdl-textfield__expandable-holder">
+                        <input class="mdl-textfield__input" type="text" name="sample" id="fixed-header-drawer-exp">
+                      </div>
+                    </div> -->
+
+                    <!-- Navigation -->
+                    <nav class="mdl-navigation">
+                        {% if not login %}
+                        <!-- <a class="mdl-navigation__link" href="{{url_for('showLogin')}}">Login</a> -->
+                        <div id="signInButton">
+                            <span class="g-signin"
+                            data-scope="openid email"
+                            data-clientid="61693127292-6pdd2h5elqsa63irq9furh5h20bejml1.apps.googleusercontent.com"
+                            data-redirecturi="postmessage"
+                            data-accesstype="offline"
+                            data-cookiepolicy="single_host_origin"
+                            data-callback="signInCallback"
+                            data-approvalprompt="force"></span>
+                        </div>
+
+                        {% else %}
+                        <a class="mdl-navigation__link" href="{{url_for('gdisconnect')}}">Logout</a>
+                        {% endif %}
+                        <!-- <a class="mdl-navigation__link" href="{{url_for('newItem')}}">Add Item</a> -->
+                    </nav>
+                </div>
+            </header>
+
+            <div class="mdl-layout__drawer">
+                <div class="mdl-layout-title">
+                    <a href="{{url_for('main_page')}}" id="main_page_link">
+                        <i class="material-icons md-36">gesture</i>
+                        <span>Catalog App</span>
+                    </a>
+                </div>
+
+                <div id="result"></div>
+                {% if login %}
+                <span class="profile_span">
+                    <img src="{{user.picture}}" width="40" class="img-circle"></img>
+                    {{user.email}}
+                </span>
+                {% endif %}
+                <span class="mdl-layout-title">Categories</span>
+                <nav class="mdl-navigation">
+                    {% for catalog in categories %}
+                    <a class="mdl-navigation__link" href="{{url_for('items_by_catalog', catalog_id = catalog.id)}}">
+                        <i class="material-icons md-36">whatshot</i>
+                        <span>{{catalog.name}} ({{catagory_amount[loop.index0]}})</span>
+                    </a>
+                    {% endfor %}
+                </nav>
+            </div>
+
+            <main class="mdl-layout__content">
+                <div class="mdl-grid">
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+    </body>
+    <script>
+    $('.content_tr').click( function() {
+        window.location = $(this).find('a').attr('href');
+    }).hover( function() {
+        $(this).toggleClass('hover');
+    });
+    </script>
+
+    <script>
+        toastr.options = {
+            "closeButton": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-bottom-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+
+        function signInCallback(authResult) {
+            if (authResult['code']) {
+                $('#signInButton').attr('style', 'display: none');
+                $.ajax({
+                    type: 'POST',
+                    url: '/gconnect?state={{state}}',
+                    processData: false,
+                    contentType: 'application/octet-stream; charset=utf-8',
+                    data: authResult['code'],
+                    success: function(result) {
+                        if (result) {
+                            toastr.success("Successfully login!");
+                            window.location.href = "{{url_for('main_page')}}";
+                        } else if (authResult['error']) {
+                            console.log('There was an error: ' + authResult['error']);
+                        } else {
+                            $('#result').html('Failed to make a server-side call.');
+                        }
+                    }
+
+                })
+            }
+        }
+    </script>
+</html>
